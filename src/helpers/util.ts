@@ -20,3 +20,10 @@ export function encode (val: string): string {
     .replace(/%5B/ig, '[')
     .replace(/%5D/ig, ']')
 }
+
+export function extend<T, U> (to: T, from: U): T & U {
+  for (let k in from) {
+    (to as T & U)[k] = from[k] as any
+  }
+  return to as T & U
+}

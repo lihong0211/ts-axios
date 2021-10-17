@@ -1,13 +1,13 @@
 
-import { AxiosPromise, AxiosRequestConfig, AxiosResponse } from "./types";
-import { parseHeaders } from './helpers/headers'
-import { createError } from './helpers/error'
+import { AxiosPromise, AxiosRequestConfig, AxiosResponse } from "../types";
+import { parseHeaders } from '../helpers/headers'
+import { createError } from '../helpers/error'
 
 export default function xhr (config: AxiosRequestConfig): AxiosPromise {
   return new Promise((resolve, reject) => {
     const { method = 'get', url, data = null, headers, responseType, timeout  } = config
     const request = new XMLHttpRequest()
-    request.open(method.toUpperCase(), url, true)
+    request.open(method.toUpperCase(), url!, true)
     // 设置一些request属性
     if (responseType) {
       request.responseType = responseType
@@ -57,7 +57,7 @@ export default function xhr (config: AxiosRequestConfig): AxiosPromise {
       if (request.status >= 200 && request.status < 300) {
         resolve(response)
       } else {
-        reject(`request failed with status code ${request.status}`)
+        reject(createError(`request failed with status code ${request.status}`, config, null, request, response))
       }
     }
   })

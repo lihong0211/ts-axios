@@ -1,6 +1,6 @@
-import pxios, { AxiosError } from '../../src/axios'
+import axios, { AxiosError } from '../../src'
 
-pxios({
+axios({
     method: 'get',
     url: '/error/get',
     data: {
@@ -13,7 +13,7 @@ pxios({
 }).then(res => {
     console.log(res)
 })
-pxios({
+axios({
     method: 'get',
     url: '/error/timeout',
     responseType: 'json',
@@ -31,7 +31,7 @@ pxios({
     console.log(e.isAxiosError)
 })
 
-pxios({
+axios({
     method: 'get',
     url: '/error/get1',
     responseType: 'json',
@@ -46,7 +46,7 @@ pxios({
 })
 
 setTimeout(() => { // 模拟网络错误  打开页面后点击offline
-    pxios({
+    axios({
         method: 'get',
         url: '/error/get',
         data: {

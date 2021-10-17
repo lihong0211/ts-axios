@@ -48,7 +48,6 @@ router.get('/url/test', function(req, res) {
 })
 
 router.post('/url/post', function(req, res) {
-    console.log(req.body)
     res.json({
         code: 0,
         msg: 'ok',
@@ -69,26 +68,47 @@ router.post('/url/buffer', function(req, res) {
     })
 })
 
-router.get('/error/get', function(req, res) {
-    if (Math.random() > 0.5) {
+function registErrorRouter() {
+    router.get('/error/get', function(req, res) {
+        if (Math.random() > 0.5) {
+            res.json({
+                msg: 'hellow world'
+            })
+        } else {
+            res.status(500)
+            res.end()
+        }
+    })
+    
+    router.get('/error/timeout', function (req, res) {
+        setTimeout(() => {
+            res.json({
+                mes: 'hellow world'
+            })
+        }, 3000)
+    })
+}
+
+
+
+function registExtendRouter () {
+    const requestArr = ['get', 'delete', 'head', 'options', 'post', 'put', 'patch']
+    requestArr.forEach(item => {
+        wrapRouter(item, `/extend/${item}`)
+    })
+}
+
+function wrapRouter (method, url) {
+    router[method](url, function(req, res) {
         res.json({
-            msg: 'hellow world'
+            code: 0,
+            msg: 'ok',
+            data: req.body
         })
-    } else {
-        res.status(500)
-        res.end()
-    }
-})
-
-router.get('/error/timeout', function (req, res) {
-    setTimeout(() => {
-        res.json({
-            mes: 'hellow world'
-        })
-    }, 3000)
-})
-
-
+    })
+}
+registErrorRouter()
+registExtendRouter()
 app.use(router)
 
 const port = process.env.PORT || 8080
