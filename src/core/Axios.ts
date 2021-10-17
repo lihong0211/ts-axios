@@ -1,7 +1,25 @@
-import { AxiosPromise, AxiosRequestConfig } from '../types';
+import { 
+  AxiosPromise,
+  AxiosRequestConfig,
+  Interceptors, 
+  AxiosInterceptorManager,
+  AxiosResponse,
+  PromiseChain
+} from '../types';
 import  dispatchRequest from './dispatchRequest'
+import InterceptorManager from './intercepterManager'
 
 export default class Axios {
+
+  interceptors: Interceptors
+
+  constructor () {
+    this.interceptors = {
+      request: new InterceptorManager<AxiosRequestConfig>(),
+      response: new InterceptorManager<AxiosResponse>()
+    }
+  }
+
   request(url: any, config?: any): AxiosPromise {
     // 为了支持axsio('url', config) 和 axios(config)  利用函数重载实现
     if (typeof url === 'string') {
@@ -13,7 +31,30 @@ export default class Axios {
     } else {
       config = url
     }
-    return dispatchRequest(config)
+
+    // 实现promise链  intercetor链式调用
+
+    const chain: PromiseChain<any>[] = [{
+      resolved: dispatchRequest,
+      rejected: undefined
+    }]
+
+    this.interceptors.request.forEach((interceptor: any) => {
+      chain.unshift(interceptor)
+    })
+
+    this.interceptors.response.forEach((interceptor: any) => {
+      chain.push(interceptor)
+    })
+
+    let promise = Promise.resolve(config)
+
+    while(chain.length) {
+      const { resolved, rejected } = chain.shift()!
+      promise = promise.then(resolved, rejected)
+    }
+
+    return promise
   }
 
   _requestWithoutData( method: string, url: string, config?: AxiosRequestConfig): AxiosPromise {

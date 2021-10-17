@@ -107,8 +107,16 @@ function wrapRouter (method, url) {
         })
     })
 }
+
+function registInterceptorRouter () {
+    router.get('/interceptor/get', function (req, res) {
+        res.end('hello world')
+    })
+}
+
 registErrorRouter()
 registExtendRouter()
+registInterceptorRouter()
 app.use(router)
 
 const port = process.env.PORT || 8080
